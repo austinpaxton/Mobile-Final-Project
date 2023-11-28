@@ -22,19 +22,19 @@
         android:id="@+id/randomRestaurant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="352dp"
+        android:layout_marginEnd="336dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
         android:contentDescription="@string/addRestaurnat"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@android:drawable/ic_menu_view"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
         android:name="com.example.groupproject.finalproject.MainActivity.OpenStreetMapFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="462dp"
+        android:layout_height="740dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

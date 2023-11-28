@@ -12,5 +12,7 @@ data class Restaurant(
     @ColumnInfo(name="longitude") var longitude:Double?,
     @ColumnInfo(name="datetime") var datetime:Double?,
     @ColumnInfo(name="name") var name:String?,
-    @ColumnInfo(name="description") var description:String?
+    @ColumnInfo(name="description") var description:String?,
+    @ColumnInfo(name = "rating") var rating: Double?
+
 )

@@ -43,12 +43,8 @@ class MapsActivity : AppCompatActivity() {
     private var locationPermissionEnabled:Boolean = false
     //Boolean to keep track of whether activity is currently requesting location Updates
     private var locationRequestsEnabled:Boolean = false
-    //Member object for the FusedLocationProvider
     private lateinit var locationProviderClient: FusedLocationProviderClient
-    //Member object for the last known location
     private lateinit var mCurrentLocation: Location
-    //Member object to hold onto locationCallback object
-    //Needed to remove requests for location updates
     private lateinit var mLocationCallback: LocationCallback
 
     private val newImageViewActivityRequestCode =1;
@@ -63,7 +59,6 @@ class MapsActivity : AppCompatActivity() {
 
         else
         {
-            Log.d("MainActivity","Picture Taken at location $currentPhotoPath")
             val imageViewIntent = Intent(this@MapsActivity, ImageViewActivity::class.java)
             val latitude = mCurrentLocation.latitude
             val longitude = mCurrentLocation.longitude
@@ -112,24 +107,27 @@ class MapsActivity : AppCompatActivity() {
                 val result = bundle.getString("bundleKey")
                 Log.d("MainActivity", "Marker has been clicked with $result")
 
-                val photoList = mapsViewModel.allRestaurants.value
-                if (photoList != null)
+                val restaurantsList = mapsViewModel.allRestaurants.value
+                if (restaurantsList != null)
                 {
-                    for (photo in photoList)
+                    for (restaurant in restaurantsList)
                     {
                         if (result != null)
                         {
-                            if (photo.value.id == result.toIntOrNull())
+                            if (restaurant.value.id == result.toIntOrNull())
                             {
                                 val imageViewIntent = Intent(this@MapsActivity, ImageViewActivity::class.java)
 
-                                imageViewIntent.putExtra("fileName", photo.value.filename.toString())
-                                imageViewIntent.putExtra("description", photo.value.description.toString())
-                                imageViewIntent.putExtra("name", photo.value.name.toString())
-                                imageViewIntent.putExtra("dateTime", photo.value.datetime.toString())
-                                imageViewIntent.putExtra("latitude", photo.value.latitude.toString())
-                                imageViewIntent.putExtra("longitude", photo.value.longitude.toString())
-                                imageViewIntent.putExtra("id", photo.value.id.toString())
+                                imageViewIntent.putExtra("fileName", restaurant.value.filename.toString())
+                                imageViewIntent.putExtra("description", restaurant.value.description.toString())
+                                imageViewIntent.putExtra("name", restaurant.value.name.toString())
+                                imageViewIntent.putExtra("rating", restaurant.value.rating)
+                                imageViewIntent.putExtra("dateTime", restaurant.value.datetime.toString())
+                                imageViewIntent.putExtra("latitude", restaurant.value.latitude.toString())
+                                imageViewIntent.putExtra("longitude", restaurant.value.longitude.toString())
+                                imageViewIntent.putExtra("id", restaurant.value.id.toString())
+
+                                Log.d("MainActivity", "Rating $restaurant")
 
                                 imageViewActivityLauncher.launch(imageViewIntent)
                             }
@@ -151,13 +149,13 @@ class MapsActivity : AppCompatActivity() {
 
         //Begin observing data changes
         mapsViewModel.allRestaurants.observe(this){
-            geoPhotos->
-            geoPhotos.let {
-                for(photo in geoPhotos)
+            geoRestaurants->
+            geoRestaurants.let {
+                for(restaurants in geoRestaurants)
                 {
-                    val latitude = photo.value.latitude
-                    val longitude = photo.value.longitude
-                    val id = photo.value.id
+                    val latitude = restaurants.value.latitude
+                    val longitude = restaurants.value.longitude
+                    val id = restaurants.value.id
                     var geoPoint:GeoPoint? = null
 
                     if(latitude!=null)
@@ -307,6 +305,7 @@ class MapsActivity : AppCompatActivity() {
             var description: String = ""
             var dateTime: Double = 0.0
             var name: String = ""
+            var rating: Double = 0.0
             val latitude = mCurrentLocation.latitude
             val longitude = mCurrentLocation.longitude
             var itemID: Int? = null
@@ -320,6 +319,9 @@ class MapsActivity : AppCompatActivity() {
             intentData?.getStringExtra(ImageViewActivity.NAME)?.let { Name ->
                 name = Name
             }
+            intentData?.getStringExtra(ImageViewActivity.RATING)?.let { Rating ->
+                rating = Rating.toDouble()
+            }
             intentData?.getStringExtra(ImageViewActivity.DATETIME)?.let { DateTime ->
                 dateTime = DateTime.toDouble()
             }
@@ -328,7 +330,7 @@ class MapsActivity : AppCompatActivity() {
                     itemID = id.toInt()
                 }
             }
-            val insertData = Restaurant(itemID, fileName, latitude, longitude, dateTime, name, description)
+            val insertData = Restaurant(itemID, fileName, latitude, longitude, dateTime, name, description, rating)
             mapsViewModel.insertRec(insertData)
         }
     }

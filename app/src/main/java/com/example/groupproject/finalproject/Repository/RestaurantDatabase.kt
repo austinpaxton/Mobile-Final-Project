@@ -60,11 +60,11 @@ public abstract class RestaurantDatabase : RoomDatabase() {
             restaurantDao.deleteAll()
 
             // Add sample words.
-            val junkData = getJunkData()
-            for (latLng in junkData){
-                restaurantDao.insert(Restaurant(null,null,latLng.value.latitude,
-                    latLng.value.longitude,null,latLng.key,""))
-            }
+           // val junkData = getJunkData()
+            //for (latLng in junkData){
+            //    restaurantDao.insert(Restaurant(null,null,latLng.value.latitude,
+            //        latLng.value.longitude,null,latLng.key,"", 0.0))
+            //}
         }
 
         fun getJunkData(): Map<String,LatLng>{
