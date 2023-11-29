@@ -11,6 +11,8 @@ import android.widget.RatingBar
 import androidx.appcompat.app.AppCompatActivity
 import com.example.groupproject.finalproject.R
 import android.util.Log
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 
 class ImageViewActivity : AppCompatActivity() {
 
@@ -18,6 +20,8 @@ class ImageViewActivity : AppCompatActivity() {
     lateinit var editNameView: EditText
     lateinit var imageView: ImageView
     lateinit var ratingBar: RatingBar
+    lateinit var editCuisineView: AutoCompleteTextView
+    var cuisineAutoComplete = arrayOf("American", "Mexican", "Italian", "Coffee", "Barbecue")
 
     //onCreate method which will set onclick listener to get the view information
     public override fun onCreate(savedInstanceState: Bundle?)
@@ -25,15 +29,20 @@ class ImageViewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.restaurant_view)
 
+
         val fileName = intent.getStringExtra("fileName")
         val name = intent.getStringExtra("name")
         val description = intent.getStringExtra("description")
-        val rating = intent.getFloatExtra("rating", 0.0f)
+        val cuisine = intent.getStringExtra("cuisine")
+        val rating = intent.getDoubleExtra("rating", 0.0)
         val dateTime = intent.getStringExtra("dateTime")
         val latitude = intent.getStringExtra("latitude")
         val longitude = intent.getStringExtra("longitude")
         val id = intent.getStringExtra("id")
 
+        editCuisineView = findViewById(R.id.cuisineTextView)
+        val adapterArray = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_dropdown_item,cuisineAutoComplete)
+        editCuisineView.setAdapter(adapterArray)
         editDescriptionView = findViewById(R.id.decriptionTextView)
         editNameView = findViewById(R.id.nameTextView)
         imageView = findViewById(R.id.imageView)
@@ -47,17 +56,15 @@ class ImageViewActivity : AppCompatActivity() {
             imageView.setImageURI(myUri)
 
             saveButton.setOnClickListener {
-                val updatedRating = ratingBar.rating.toFloat()
                 val replyIntent = Intent()
                 val currentTime = System.currentTimeMillis() / 1000
                 replyIntent.putExtra(FILENAME, fileName)
                 replyIntent.putExtra(DATETIME, currentTime)
                 replyIntent.putExtra(DESCRIPTION, editDescriptionView.text.toString())
                 replyIntent.putExtra(NAME, editNameView.text.toString())
+                replyIntent.putExtra(CUISINE, editCuisineView.text.toString())
                 replyIntent.putExtra(RATING, ratingBar.rating.toDouble())
                 setResult(Activity.RESULT_OK, replyIntent)
-
-                Log.d("ImageViewActivity", "Rating value if: $replyIntent")
                 finish()
             }
         }
@@ -66,6 +73,7 @@ class ImageViewActivity : AppCompatActivity() {
         {
             editDescriptionView.setText(description)
             editNameView.setText(name)
+            editCuisineView.setText(cuisine)
             ratingBar.rating = rating?.toFloat() ?: 0.0f
             val myUri: Uri? = Uri.parse(fileName)
             imageView.setImageURI(myUri)
@@ -76,14 +84,13 @@ class ImageViewActivity : AppCompatActivity() {
                 replyIntent.putExtra(FILENAME, fileName)
                 replyIntent.putExtra(DESCRIPTION, editDescriptionView.text.toString())
                 replyIntent.putExtra(NAME, editNameView.text.toString())
+                replyIntent.putExtra(CUISINE, editCuisineView.text.toString())
                 replyIntent.putExtra(RATING, ratingBar.rating.toDouble())
                 replyIntent.putExtra(DATETIME, currentTime)
                 replyIntent.putExtra(LATITUDE, longitude.toString())
                 replyIntent.putExtra(LONGITUDE, latitude.toString())
                 replyIntent.putExtra(ID, id.toString())
                 setResult(Activity.RESULT_OK, replyIntent)
-//                Log.d("ImageViewActivity","id ${id}, description ${description}]")
-                Log.d("ImageViewActivity", "Rating value: $RATING")
                 finish()
             }
         }
@@ -98,5 +105,6 @@ class ImageViewActivity : AppCompatActivity() {
         const val ID = "com.example.groupproject.finalproject.ID"
         const val NAME = "com.example.groupproject.finalproject.NAME"
         const val RATING = "com.example.groupproject.finalproject.RATING"
+        const val CUISINE = "com.example.groupproject.finalproject.CUISINE"
     }
 }

@@ -13,6 +13,7 @@ data class Restaurant(
     @ColumnInfo(name="datetime") var datetime:Double?,
     @ColumnInfo(name="name") var name:String?,
     @ColumnInfo(name="description") var description:String?,
+    @ColumnInfo(name="cuisine") var cuisine:String?,
     @ColumnInfo(name = "rating") var rating: Double?
 
 )

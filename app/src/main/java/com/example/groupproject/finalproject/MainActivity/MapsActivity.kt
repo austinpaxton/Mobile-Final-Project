@@ -11,6 +11,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.preference.PreferenceManager
 import android.util.Log
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -64,6 +65,7 @@ class MapsActivity : AppCompatActivity() {
             val longitude = mCurrentLocation.longitude
             imageViewIntent.putExtra("fileName", currentPhotoPath)
             imageViewIntent.putExtra("description", "")
+            imageViewIntent.putExtra("cuisine", "")
             imageViewActivityLauncher.launch(imageViewIntent)
         }
     }
@@ -121,14 +123,13 @@ class MapsActivity : AppCompatActivity() {
                                 imageViewIntent.putExtra("fileName", restaurant.value.filename.toString())
                                 imageViewIntent.putExtra("description", restaurant.value.description.toString())
                                 imageViewIntent.putExtra("name", restaurant.value.name.toString())
+                                imageViewIntent.putExtra("cuisine", restaurant.value.cuisine.toString())
                                 imageViewIntent.putExtra("rating", restaurant.value.rating)
                                 imageViewIntent.putExtra("dateTime", restaurant.value.datetime.toString())
                                 imageViewIntent.putExtra("latitude", restaurant.value.latitude.toString())
                                 imageViewIntent.putExtra("longitude", restaurant.value.longitude.toString())
                                 imageViewIntent.putExtra("id", restaurant.value.id.toString())
-
                                 Log.d("MainActivity", "Rating $restaurant")
-
                                 imageViewActivityLauncher.launch(imageViewIntent)
                             }
                         }
@@ -305,6 +306,7 @@ class MapsActivity : AppCompatActivity() {
             var description: String = ""
             var dateTime: Double = 0.0
             var name: String = ""
+            var cuisine: String = ""
             var rating: Double = 0.0
             val latitude = mCurrentLocation.latitude
             val longitude = mCurrentLocation.longitude
@@ -319,8 +321,11 @@ class MapsActivity : AppCompatActivity() {
             intentData?.getStringExtra(ImageViewActivity.NAME)?.let { Name ->
                 name = Name
             }
-            intentData?.getStringExtra(ImageViewActivity.RATING)?.let { Rating ->
-                rating = Rating.toDouble()
+            intentData?.getStringExtra(ImageViewActivity.CUISINE)?.let { Cuisine ->
+                cuisine = Cuisine
+            }
+            intentData?.getDoubleExtra(ImageViewActivity.RATING, 0.0)?.let { Rating ->
+                rating = Rating
             }
             intentData?.getStringExtra(ImageViewActivity.DATETIME)?.let { DateTime ->
                 dateTime = DateTime.toDouble()
@@ -330,7 +335,7 @@ class MapsActivity : AppCompatActivity() {
                     itemID = id.toInt()
                 }
             }
-            val insertData = Restaurant(itemID, fileName, latitude, longitude, dateTime, name, description, rating)
+            val insertData = Restaurant(itemID, fileName, latitude, longitude, dateTime, name, description, cuisine ,rating)
             mapsViewModel.insertRec(insertData)
         }
     }
