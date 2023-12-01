@@ -14,4 +14,8 @@
     <string name="addDescription">Description...</string>
     <string name="addName">Name...</string>
     <string name="addCuisine">Cuisine...</string>
+    <string name="addAddress">Address...</string>
+    <string name="restaurantOne">Restaurant One...</string>
+    <string name="restaurantTwo">Restaurant Two...</string>
+    <string name="restaurantThree">Restaurant Three...</string>
 </resources>

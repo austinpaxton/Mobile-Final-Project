@@ -25,7 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileFinalProject">
         <activity
-            android:name=".MainActivity.ImageViewActivity"
+            android:name=".MainActivity.RestaurantViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity.RandomViewActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity.MapsActivity"

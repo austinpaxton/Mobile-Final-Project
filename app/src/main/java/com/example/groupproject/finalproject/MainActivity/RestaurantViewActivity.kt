@@ -10,11 +10,10 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import androidx.appcompat.app.AppCompatActivity
 import com.example.groupproject.finalproject.R
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 
-class ImageViewActivity : AppCompatActivity() {
+class RestaurantViewActivity : AppCompatActivity() {
 
     lateinit var editDescriptionView: EditText
     lateinit var editNameView: EditText
@@ -44,7 +43,7 @@ class ImageViewActivity : AppCompatActivity() {
         val adapterArray = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_dropdown_item,cuisineAutoComplete)
         editCuisineView.setAdapter(adapterArray)
         editDescriptionView = findViewById(R.id.decriptionTextView)
-        editNameView = findViewById(R.id.nameTextView)
+        editNameView = findViewById(R.id.restaurantOneTextView)
         imageView = findViewById(R.id.imageView)
         ratingBar = findViewById(R.id.ratingBar)
 

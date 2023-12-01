@@ -11,7 +11,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.preference.PreferenceManager
 import android.util.Log
-import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -60,7 +59,7 @@ class MapsActivity : AppCompatActivity() {
 
         else
         {
-            val imageViewIntent = Intent(this@MapsActivity, ImageViewActivity::class.java)
+            val imageViewIntent = Intent(this@MapsActivity, RestaurantViewActivity::class.java)
             val latitude = mCurrentLocation.latitude
             val longitude = mCurrentLocation.longitude
             imageViewIntent.putExtra("fileName", currentPhotoPath)
@@ -72,7 +71,7 @@ class MapsActivity : AppCompatActivity() {
 
     val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
-            Log.d("MapsActivity", "Permission Granted")
+            Log.d("MainActivity", "Permission Granted")
         } else {
             Toast.makeText(this, "Location permissions not granted. Location disabled on map", Toast.LENGTH_LONG).show()
         }
@@ -97,10 +96,14 @@ class MapsActivity : AppCompatActivity() {
             takeNewPhoto()
         }
 
-        //Get preferences for tile cache
-        getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
+        findViewById<FloatingActionButton>(R.id.randomRestaurant).setOnClickListener{
+            val restaurantIntent = Intent(this@MapsActivity, RandomViewActivity::class.java)
+            // Start the new activity
+            startActivity(restaurantIntent)
+        }
 
-        //Check for location permissions
+
+        getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
         checkForLocationPermission()
 
         //marker click listener
@@ -118,7 +121,7 @@ class MapsActivity : AppCompatActivity() {
                         {
                             if (restaurant.value.id == result.toIntOrNull())
                             {
-                                val imageViewIntent = Intent(this@MapsActivity, ImageViewActivity::class.java)
+                                val imageViewIntent = Intent(this@MapsActivity, RestaurantViewActivity::class.java)
 
                                 imageViewIntent.putExtra("fileName", restaurant.value.filename.toString())
                                 imageViewIntent.putExtra("description", restaurant.value.description.toString())
@@ -181,18 +184,15 @@ class MapsActivity : AppCompatActivity() {
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         when {
-            //If successful, startLocationRequests
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                 locationPermissionEnabled = true
                 startLocationRequests()
             }
-            //If successful at coarse detail, we still want those
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                 locationPermissionEnabled = true
                 startLocationRequests()
             }
             else -> {
-            //Otherwise, send toast saying location is not enabled
             locationPermissionEnabled = false
             Toast.makeText(this,"Location Not Enabled",Toast.LENGTH_LONG)
             }
@@ -201,43 +201,31 @@ class MapsActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        //Start location updates
         startLocationRequests()
     }
 
     override fun onStop(){
         super.onStop()
-        //if we are currently getting updates
         if(locationRequestsEnabled){
-            //stop getting updates
             locationRequestsEnabled = false
             stopLocationUpdates(locationProviderClient,mLocationCallback)
         }
     }
 
     private fun startLocationRequests(){
-        //If we aren't currently getting location updates
         if(!locationRequestsEnabled){
-            //create a location callback
             mLocationCallback = createLocationCallback(locationUtilCallback)
-            //and request location updates, setting the boolean equal to whether this was successful
             locationRequestsEnabled = createLocationRequest(this,locationProviderClient,mLocationCallback)
         }
     }
 
-    //LocationUtilCallback object
-    //Dynamically defining two results from locationUtils
-    //Namely requestPermissions and locationUpdated
+
     private val locationUtilCallback = object: LocationUtilCallback {
-        //If locationUtil request fails because of permission issues
-        //Ask for permissions
         override fun requestPermissionCallback() {
             locationPermissionRequest.launch(arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION))
         }
-        //If locationUtil returns a Location object
-        //Populate the current location and log
         override fun locationUpdatedCallback(location: Location) {
             mCurrentLocation = location
             Log.d("MainActivity","Location is [Lat: ${location.latitude}, Long: ${location.longitude}]")
@@ -249,8 +237,6 @@ class MapsActivity : AppCompatActivity() {
             ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
-                //getLastKnownLocation()
-                //registerLocationUpdateCallbacks()
             }
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -312,25 +298,25 @@ class MapsActivity : AppCompatActivity() {
             val longitude = mCurrentLocation.longitude
             var itemID: Int? = null
 
-            intentData?.getStringExtra(ImageViewActivity.FILENAME)?.let { FileName ->
+            intentData?.getStringExtra(RestaurantViewActivity.FILENAME)?.let { FileName ->
                 fileName = FileName
             }
-            intentData?.getStringExtra(ImageViewActivity.DESCRIPTION)?.let { Description ->
+            intentData?.getStringExtra(RestaurantViewActivity.DESCRIPTION)?.let { Description ->
                 description = Description
             }
-            intentData?.getStringExtra(ImageViewActivity.NAME)?.let { Name ->
+            intentData?.getStringExtra(RestaurantViewActivity.NAME)?.let { Name ->
                 name = Name
             }
-            intentData?.getStringExtra(ImageViewActivity.CUISINE)?.let { Cuisine ->
+            intentData?.getStringExtra(RestaurantViewActivity.CUISINE)?.let { Cuisine ->
                 cuisine = Cuisine
             }
-            intentData?.getDoubleExtra(ImageViewActivity.RATING, 0.0)?.let { Rating ->
+            intentData?.getDoubleExtra(RestaurantViewActivity.RATING, 0.0)?.let { Rating ->
                 rating = Rating
             }
-            intentData?.getStringExtra(ImageViewActivity.DATETIME)?.let { DateTime ->
+            intentData?.getStringExtra(RestaurantViewActivity.DATETIME)?.let { DateTime ->
                 dateTime = DateTime.toDouble()
             }
-            intentData?.getStringExtra(ImageViewActivity.ID)?.let { id ->
+            intentData?.getStringExtra(RestaurantViewActivity.ID)?.let { id ->
                 if(id != "null") {
                     itemID = id.toInt()
                 }
@@ -341,7 +327,7 @@ class MapsActivity : AppCompatActivity() {
     }
 
     private fun createNewImageActivity(myItem: Restaurant){
-        val intent = Intent(this@MapsActivity,ImageViewActivity::class.java)
+        val intent = Intent(this@MapsActivity,RestaurantViewActivity::class.java)
         intent.putExtra("fileName", myItem.filename)
         intent.putExtra("description", myItem.description)
         startActivityForResult(intent,newImageViewActivityRequestCode)
