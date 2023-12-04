@@ -159,6 +159,7 @@ class MapsActivity : AppCompatActivity() {
                 {
                     val latitude = restaurants.value.latitude
                     val longitude = restaurants.value.longitude
+                    val name = restaurants.value.name.toString()
                     val id = restaurants.value.id
                     var geoPoint:GeoPoint? = null
 
