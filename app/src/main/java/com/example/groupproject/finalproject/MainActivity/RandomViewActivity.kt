@@ -3,15 +3,14 @@ package com.example.groupproject.finalproject.MainActivity
 
 import android.os.Bundle
 import android.widget.Button
-import android.view.Gravity
-import android.widget.LinearLayout
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.groupproject.finalproject.R
 import android.widget.EditText
 import android.widget.TextView
 import kotlin.random.Random
-import android.widget.Toast
 
 class RandomViewActivity :  AppCompatActivity() {
 
@@ -48,6 +47,15 @@ class RandomViewActivity :  AppCompatActivity() {
 
             // Make the resultTextView visible
             resultTextView.visibility = View.VISIBLE
+
+            // Delay execution by 3 seconds
+            Handler(Looper.getMainLooper()).postDelayed({
+                // Code to be executed after 5 seconds
+                // For example, reset the resultTextView visibility
+                finish()
+            }, 3000)
+
+
             }
         }
 

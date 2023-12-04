@@ -40,28 +40,6 @@
             app:layout_constraintVertical_bias="0.22" />
 
         <EditText
-            android:id="@+id/addressTextView"
-            android:layout_width="372dp"
-            android:layout_height="78dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="250dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="100dp"
-            android:ellipsize="start"
-            android:fontFamily="sans-serif-light"
-            android:gravity="start"
-            android:hint="@string/addAddress"
-            android:minHeight="48dp"
-            android:textAlignment="viewStart"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.586" />
-
-        <EditText
             android:id="@+id/restaurantOneTextView"
             android:layout_width="372dp"
             android:layout_height="78dp"
