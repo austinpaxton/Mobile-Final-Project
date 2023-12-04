@@ -21,6 +21,7 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import com.example.groupproject.finalproject.TextOverlay
 
 class OpenStreetMapFragment : Fragment(), Marker.OnMarkerClickListener {
 
@@ -113,30 +114,35 @@ class OpenStreetMapFragment : Fragment(), Marker.OnMarkerClickListener {
     }
 
     //adding marker
-    fun addMarker(geoPoint: GeoPoint, id:Int){
+    fun addMarker(geoPoint: GeoPoint, id: Int, text: String) {
+
+        clearOneMarker(id)
+
+        // Add regular marker
         val startMarker = Marker(mMap)
         startMarker.position = geoPoint
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_TOP)
         startMarker.setOnMarkerClickListener(this)
         startMarker.id = id.toString()
+        startMarker.setInfoWindow(null)
+        startMarker.icon = ResourcesCompat.getDrawable(resources, R.drawable.map_pin_small, null)
+        mMap.overlays.add(startMarker)
 
-        startMarker.icon = ResourcesCompat.getDrawable(resources,R.drawable.map_pin_small,null)
-        mMap.getOverlays().add(startMarker)
+        // Add text overlay
+        val textOverlay = TextOverlay(mMap, geoPoint, text)
+
+        mMap.overlays.add(textOverlay)
+    }
+
+    fun clearOneMarker(id: Int) {
+        mMap.overlays.removeAll { overlay ->
+            overlay is Marker && overlay.id == id.toString()
+        }
     }
 
     fun clearMarkers(){
         mMap.overlays.clear()
         setupMapOptions()
-    }
-
-    fun clearOneMarker(id:Int){
-        for(overlay in mMap.overlays){
-            if(overlay is Marker){
-                if(overlay.id == id.toString()){
-                    mMap.overlays.remove(overlay)
-                }
-            }
-        }
     }
 
     override fun onMarkerClick(marker: Marker?, mapView: MapView?): Boolean {

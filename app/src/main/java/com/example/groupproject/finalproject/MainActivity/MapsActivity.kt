@@ -133,6 +133,7 @@ class MapsActivity : AppCompatActivity() {
                                 imageViewIntent.putExtra("longitude", restaurant.value.longitude.toString())
                                 imageViewIntent.putExtra("id", restaurant.value.id.toString())
                                 Log.d("MainActivity", "Rating $restaurant")
+
                                 imageViewActivityLauncher.launch(imageViewIntent)
                             }
                         }
@@ -173,7 +174,7 @@ class MapsActivity : AppCompatActivity() {
 
                     if(id != null && geoPoint!= null)
                     {
-                        mapsFragment.addMarker(geoPoint,id)
+                        mapsFragment.addMarker(geoPoint,id,name)
                     }
                 }
             }
