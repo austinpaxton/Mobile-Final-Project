@@ -22,10 +22,9 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.osmdroid.config.Configuration.*
-
-
 import com.example.groupproject.finalproject.RestaurantApplication
 import com.example.groupproject.finalproject.R
+import com.example.groupproject.finalproject.RestaurantInfo
 import com.example.groupproject.finalproject.Repository.Restaurant
 import com.example.groupproject.finalproject.Util.replaceFragmentInActivity
 import com.example.groupproject.bestlocationever.Util.*
@@ -39,9 +38,7 @@ class MapsActivity : AppCompatActivity() {
     private lateinit var mapsFragment: OpenStreetMapFragment
     var currentPhotoPath:String = ""
 
-    //Boolean to keep track of whether permissions have been granted
     private var locationPermissionEnabled:Boolean = false
-    //Boolean to keep track of whether activity is currently requesting location Updates
     private var locationRequestsEnabled:Boolean = false
     private lateinit var locationProviderClient: FusedLocationProviderClient
     private lateinit var mCurrentLocation: Location
@@ -60,8 +57,8 @@ class MapsActivity : AppCompatActivity() {
         else
         {
             val imageViewIntent = Intent(this@MapsActivity, RestaurantViewActivity::class.java)
-            val latitude = mCurrentLocation.latitude
-            val longitude = mCurrentLocation.longitude
+            //val latitude = mCurrentLocation.latitude
+           // val longitude = mCurrentLocation.longitude
             imageViewIntent.putExtra("fileName", currentPhotoPath)
             imageViewIntent.putExtra("description", "")
             imageViewIntent.putExtra("cuisine", "")
@@ -90,6 +87,7 @@ class MapsActivity : AppCompatActivity() {
         //Attempt to get the last known location
         // Will either require permission check or will return last known location
         // through the locationUtilCallback
+
         getLastLocation(this,locationProviderClient,locationUtilCallback)
 
         findViewById<FloatingActionButton>(R.id.addRestaurant).setOnClickListener{
@@ -97,9 +95,38 @@ class MapsActivity : AppCompatActivity() {
         }
 
         findViewById<FloatingActionButton>(R.id.randomRestaurant).setOnClickListener{
-            val restaurantIntent = Intent(this@MapsActivity, RandomViewActivity::class.java)
+            val randomIntent = Intent(this@MapsActivity, RandomViewActivity::class.java)
             // Start the new activity
-            startActivity(restaurantIntent)
+            startActivity(randomIntent)
+        }
+
+        findViewById<FloatingActionButton>(R.id.distanceFrom).setOnClickListener{
+            val restaurantInfoList = mapsViewModel.allRestaurants.value?.mapNotNull { restaurant ->
+                val latitude = restaurant.value.latitude?.toDouble()
+                val longitude = restaurant.value.longitude?.toDouble()
+
+                if (latitude != null && longitude != null) {
+                    RestaurantInfo(
+                        name = restaurant.value.name.toString(),
+                        latitude = latitude,
+                        longitude = longitude
+                    )
+                } else {
+                    null
+                }
+            }
+
+            if (restaurantInfoList != null && restaurantInfoList.isNotEmpty()) {
+                val distanceIntent = Intent(this@MapsActivity, DistanceViewActivity::class.java)
+                distanceIntent.putExtra("currentLatitude", mCurrentLocation.latitude)
+                distanceIntent.putExtra("currentLongitude", mCurrentLocation.longitude)
+
+                distanceIntent.putParcelableArrayListExtra("restaurantInfoList", ArrayList(restaurantInfoList))
+
+                startActivity(distanceIntent)
+            } else {
+                // Handle the case where the restaurantInfoList is empty or null
+            }
         }
 
 
@@ -153,7 +180,8 @@ class MapsActivity : AppCompatActivity() {
         }
 
         //Begin observing data changes
-        mapsViewModel.allRestaurants.observe(this){
+        mapsViewModel.allRestaurants.observe(this)
+        {
             geoRestaurants->
             geoRestaurants.let {
                 for(restaurants in geoRestaurants)
@@ -163,18 +191,15 @@ class MapsActivity : AppCompatActivity() {
                     val name = restaurants.value.name.toString()
                     val id = restaurants.value.id
                     var geoPoint:GeoPoint? = null
+                    Log.d("MainActivity","Testing fun ${restaurants.value.id}")
 
-                    if(latitude!=null)
+                    if (latitude != null && longitude != null)
                     {
-                        if(longitude!= null)
-                        {
-                            geoPoint = GeoPoint(latitude,longitude)
+                        geoPoint = GeoPoint(latitude, longitude)
+
+                        id?.let { nonNullId ->
+                            mapsFragment.addMarker(geoPoint, nonNullId, name)
                         }
-                    }
-
-                    if(id != null && geoPoint!= null)
-                    {
-                        mapsFragment.addMarker(geoPoint,id,name)
                     }
                 }
             }
@@ -229,8 +254,8 @@ class MapsActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION))
         }
         override fun locationUpdatedCallback(location: Location) {
-            mCurrentLocation = location
-            Log.d("MainActivity","Location is [Lat: ${location.latitude}, Long: ${location.longitude}]")
+                mCurrentLocation = location
+                Log.d("MainActivity", "Location is [Lat: ${location.latitude}, Long: ${location.longitude}]")
         }
     }
 
@@ -290,41 +315,55 @@ class MapsActivity : AppCompatActivity() {
 
         else
         {
-            var fileName: String = ""
-            var description: String = ""
-            var dateTime: Double = 0.0
-            var name: String = ""
-            var cuisine: String = ""
-            var rating: Double = 0.0
-            val latitude = mCurrentLocation.latitude
-            val longitude = mCurrentLocation.longitude
-            var itemID: Int? = null
+            if (::mCurrentLocation.isInitialized) {
+                var fileName: String = ""
+                var description: String = ""
+                var dateTime: Double = 0.0
+                var name: String = ""
+                var cuisine: String = ""
+                var rating: Double = 0.0
+                val latitude = mCurrentLocation.latitude
+                val longitude = mCurrentLocation.longitude
+                var itemID: Int? = null
 
-            intentData?.getStringExtra(RestaurantViewActivity.FILENAME)?.let { FileName ->
-                fileName = FileName
-            }
-            intentData?.getStringExtra(RestaurantViewActivity.DESCRIPTION)?.let { Description ->
-                description = Description
-            }
-            intentData?.getStringExtra(RestaurantViewActivity.NAME)?.let { Name ->
-                name = Name
-            }
-            intentData?.getStringExtra(RestaurantViewActivity.CUISINE)?.let { Cuisine ->
-                cuisine = Cuisine
-            }
-            intentData?.getDoubleExtra(RestaurantViewActivity.RATING, 0.0)?.let { Rating ->
-                rating = Rating
-            }
-            intentData?.getStringExtra(RestaurantViewActivity.DATETIME)?.let { DateTime ->
-                dateTime = DateTime.toDouble()
-            }
-            intentData?.getStringExtra(RestaurantViewActivity.ID)?.let { id ->
-                if(id != "null") {
-                    itemID = id.toInt()
+                intentData?.getStringExtra(RestaurantViewActivity.FILENAME)?.let { FileName ->
+                    fileName = FileName
                 }
+                intentData?.getStringExtra(RestaurantViewActivity.DESCRIPTION)?.let { Description ->
+                    description = Description
+                }
+                intentData?.getStringExtra(RestaurantViewActivity.NAME)?.let { Name ->
+                    name = Name
+                }
+                intentData?.getStringExtra(RestaurantViewActivity.CUISINE)?.let { Cuisine ->
+                    cuisine = Cuisine
+                }
+                intentData?.getDoubleExtra(RestaurantViewActivity.RATING, 0.0)?.let { Rating ->
+                    rating = Rating
+                }
+                intentData?.getStringExtra(RestaurantViewActivity.DATETIME)?.let { DateTime ->
+                    dateTime = DateTime.toDouble()
+                }
+                intentData?.getStringExtra(RestaurantViewActivity.ID)?.let { id ->
+                    if (id != "null") {
+                        itemID = id.toInt()
+                    }
+                }
+                val insertData = Restaurant(
+                    itemID,
+                    fileName,
+                    latitude,
+                    longitude,
+                    dateTime,
+                    name,
+                    description,
+                    cuisine,
+                    rating
+                )
+                mapsViewModel.insertRec(insertData)
+            }else {
+                Log.e("MainActivity", "mCurrentLocation has not been initialized")
             }
-            val insertData = Restaurant(itemID, fileName, latitude, longitude, dateTime, name, description, cuisine ,rating)
-            mapsViewModel.insertRec(insertData)
         }
     }
 

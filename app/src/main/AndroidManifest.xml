@@ -31,6 +31,9 @@
             android:name=".MainActivity.RandomViewActivity"
             android:exported="false" />
         <activity
+            android:name=".MainActivity.DistanceViewActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity.MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">

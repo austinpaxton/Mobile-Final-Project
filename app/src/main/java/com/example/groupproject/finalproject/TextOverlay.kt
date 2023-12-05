@@ -26,7 +26,6 @@ class TextOverlay(private val mapView: MapView, private val geoPoint: GeoPoint, 
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
         if (!shadow) {
             // Log the text value
-            Log.d("TextOverlay", "Text to display: $text")
 
             val projection = mapView.projection
             projection.toPixels(geoPoint, point)

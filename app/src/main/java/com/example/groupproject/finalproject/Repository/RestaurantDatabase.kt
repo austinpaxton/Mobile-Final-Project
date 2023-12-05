@@ -59,18 +59,34 @@ public abstract class RestaurantDatabase : RoomDatabase() {
             // Delete all content here.
             restaurantDao.deleteAll()
 
-            // Add sample words.
-           // val junkData = getJunkData()
-            //for (latLng in junkData){
-            //    restaurantDao.insert(Restaurant(null,null,latLng.value.latitude,
-            //        latLng.value.longitude,null,latLng.key,"", 0.0))
-            //}
+            val junkData = getJunkData()
+            for ((name, data) in junkData) {
+                restaurantDao.insert(
+                    Restaurant(
+                        data.id,
+                        null,
+                        data.latitude,
+                        data.longitude,
+                        null,
+                        name,
+                        data.description,
+                        data.cuisine,
+                        data.rating
+                    )
+                )
+            }
         }
 
-        fun getJunkData(): Map<String,LatLng>{
-            val locationList:MutableMap<String,LatLng> = HashMap<String,LatLng>()
+        fun getJunkData(): Map<String, RestaurantData>{
+            val restaurantDataList: MutableMap<String, RestaurantData> = HashMap()
 
-            return locationList
+            restaurantDataList["Freddy's"] = RestaurantData(1,36.105102, -94.206071, "Vintage-style chain for steakburgers, hot dogs & other fast-food staples, plus frozen custard.", "American", 2.5)
+            restaurantDataList["Mr Taco Loco"] = RestaurantData(2, 36.045870, -94.165290, "Serves happy hour food · Serves great cocktails · Doesn't accept reservations", "Mexican", 4.0)
+
+
+            return restaurantDataList
         }
+
+        data class RestaurantData(val id: Int, val latitude: Double, val longitude: Double, val description: String, val cuisine: String, val rating: Double)
     }
 }

@@ -13,6 +13,7 @@ import com.example.groupproject.finalproject.R
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 
+
 class RestaurantViewActivity : AppCompatActivity() {
 
     lateinit var editDescriptionView: EditText
@@ -27,7 +28,6 @@ class RestaurantViewActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.restaurant_view)
-
 
         val fileName = intent.getStringExtra("fileName")
         val name = intent.getStringExtra("name")

@@ -115,9 +115,6 @@ class OpenStreetMapFragment : Fragment(), Marker.OnMarkerClickListener {
 
     //adding marker
     fun addMarker(geoPoint: GeoPoint, id: Int, text: String) {
-
-        clearOneMarker(id)
-
         // Add regular marker
         val startMarker = Marker(mMap)
         startMarker.position = geoPoint
