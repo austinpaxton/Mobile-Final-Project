@@ -68,10 +68,26 @@ class MapsActivity : AppCompatActivity() {
 
     val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
+            // Location permission is granted, you can now proceed with location-related functionality
             Log.d("MainActivity", "Permission Granted")
+            initializeLocation()
         } else {
-            Toast.makeText(this, "Location permissions not granted. Location disabled on map", Toast.LENGTH_LONG).show()
+            // Double-check the permission status
+            if (ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                // Location permission is granted after double-checking
+                initializeLocation()
+            } else {
+                // Location permission is not granted
+                Toast.makeText(this, "Location permissions not granted. Location disabled on map", Toast.LENGTH_LONG).show()
+            }
         }
+    }
+
+    private fun initializeLocation() {
+        startLocationRequests()
     }
 
     private val mapsViewModel: MapsViewModel by viewModels {
@@ -96,8 +112,39 @@ class MapsActivity : AppCompatActivity() {
 
         findViewById<FloatingActionButton>(R.id.randomRestaurant).setOnClickListener{
             val randomIntent = Intent(this@MapsActivity, RandomViewActivity::class.java)
+            val restaurantNames = mapsViewModel.allRestaurants.value?.map { it.value.name.toString() }
+            randomIntent.putStringArrayListExtra("restaurantNames", ArrayList(restaurantNames))
             // Start the new activity
             startActivity(randomIntent)
+        }
+
+        findViewById<FloatingActionButton>(R.id.sortByCuisine).setOnClickListener{
+            val restaurantInfoList = mapsViewModel.allRestaurants.value?.mapNotNull { restaurant ->
+                val latitude = restaurant.value.latitude?.toDouble()
+                val longitude = restaurant.value.longitude?.toDouble()
+                val rating = restaurant.value.rating?.toDouble()?: 0.0
+
+                if (latitude != null && longitude != null) {
+                    RestaurantInfo(
+                        name = restaurant.value.name.toString(),
+                        latitude = latitude,
+                        longitude = longitude,
+                        cuisine = restaurant.value.cuisine.toString(),
+                        rating = rating
+                    )
+                } else {
+                    null
+                }
+            }
+
+            if (restaurantInfoList != null && restaurantInfoList.isNotEmpty()) {
+                val cuisineIntent = Intent(this@MapsActivity, SortByCuisineViewActivity::class.java)
+                cuisineIntent.putParcelableArrayListExtra("restaurantInfoList", ArrayList(restaurantInfoList))
+
+                startActivity(cuisineIntent)
+            } else {
+                // Handle the case where the restaurantInfoList is empty or null
+            }
         }
 
         findViewById<FloatingActionButton>(R.id.distanceFrom).setOnClickListener{
@@ -109,7 +156,9 @@ class MapsActivity : AppCompatActivity() {
                     RestaurantInfo(
                         name = restaurant.value.name.toString(),
                         latitude = latitude,
-                        longitude = longitude
+                        longitude = longitude,
+                        cuisine = "",
+                        rating = 0.0
                     )
                 } else {
                     null
@@ -259,13 +308,16 @@ class MapsActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkForLocationPermission(){
+    private fun checkForLocationPermission() {
         when {
             ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
+                // Location permission is already granted
+                initializeLocation()
             }
             else -> {
+                // Request location permission
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }

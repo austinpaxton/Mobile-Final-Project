@@ -6,11 +6,15 @@ import android.os.Parcelable
 data class RestaurantInfo(
     val name: String,
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
+    val cuisine: String,
+    val rating: Double
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readDouble(),
+        parcel.readDouble(),
+        parcel.readString()!!,
         parcel.readDouble()
     )
 
@@ -18,6 +22,8 @@ data class RestaurantInfo(
         parcel.writeString(name)
         parcel.writeDouble(latitude)
         parcel.writeDouble(longitude)
+        parcel.writeString(cuisine)
+        parcel.writeDouble(rating)
     }
 
     override fun describeContents(): Int {

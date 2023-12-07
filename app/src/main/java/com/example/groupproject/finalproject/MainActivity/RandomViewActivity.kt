@@ -6,18 +6,19 @@ import android.widget.Button
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.groupproject.finalproject.R
-import android.widget.EditText
 import android.widget.TextView
 import kotlin.random.Random
 
 class RandomViewActivity :  AppCompatActivity() {
 
     private lateinit var randomButton: Button
-    private lateinit var editRestaurantOneView: EditText
-    private lateinit var editRestaurantTwoView: EditText
-    private lateinit var editRestaurantThreeView: EditText
+    private lateinit var editRestaurantOneView: AutoCompleteTextView
+    private lateinit var editRestaurantTwoView: AutoCompleteTextView
+    private lateinit var editRestaurantThreeView: AutoCompleteTextView
     private lateinit var resultTextView: TextView
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +29,14 @@ class RandomViewActivity :  AppCompatActivity() {
         editRestaurantThreeView = findViewById(R.id.restaurantThreeTextView)
         resultTextView = findViewById(R.id.resultTextView)
         randomButton = findViewById(R.id.randomButton)
+        val restaurantNames = intent.getStringArrayListExtra("restaurantNames")?.toMutableList() ?: mutableListOf()
+        val adapterArray = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_dropdown_item,restaurantNames.toList())
+        editRestaurantOneView.setAdapter(adapterArray)
+        editRestaurantTwoView.setAdapter(adapterArray)
+        editRestaurantThreeView.setAdapter(adapterArray)
 
         randomButton.setOnClickListener{
+
 
             val restaurantOne = editRestaurantOneView.text.toString()
             val restaurantTwo = editRestaurantTwoView.text.toString()
